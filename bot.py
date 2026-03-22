@@ -89,13 +89,26 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.inline_query.answer(results, cache_time=0)
 
 def main():
-    app = Application.builder().token(BOT_TOKEN).build()
+ # Сначала стартует веб-сервер — Render видит порт и доволен
+    port = int(os.environ.get("PORT", 10000))
+    server = HTTPServer(("0.0.0.0", port), HealthHandler)
+    
+    web_thread = threading.Thread(target=server.serve_forever, daemon=True)
+    web_thread.start()
+    logger.info(f"Веб-сервер запущен на порту {port}...")
 
+    # Потом запускается бот
+    app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(InlineQueryHandler(inline_query))
 
     logger.info("Бот запущен...")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
+```
+
+Ключевое изменение — порт теперь `10000` (Render по умолчанию ждёт именно его), и веб-сервер стартует **до** `run_polling`.
+
+---
 
 if __name__ == "__main__":
     main()

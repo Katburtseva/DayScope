@@ -10,7 +10,7 @@ import uuid
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-BOT_TOKEN = os.environ.get("8611165698:AAH3CyPcn5g0uSf_Efa2qEAEA-9SJ8l6aCI")
+BOT_TOKEN = "8611165698:AAH3CyPcn5g0uSf_Efa2qEAEA-9SJ8l6aCI"
 
 DICK_PHRASES = [
     "🍆 Мой огурчик",

@@ -1,5 +1,8 @@
 import logging
 import random
+import os
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
 from telegram import Update, InlineQueryResultArticle, InputTextMessageContent
 from telegram.ext import Application, InlineQueryHandler, CommandHandler, ContextTypes
 import uuid
@@ -7,7 +10,7 @@ import uuid
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-BOT_TOKEN = "8611165698:AAH3CyPcn5g0uSf_Efa2qEAEA-9SJ8l6aCI"
+BOT_TOKEN = os.environ.get("8611165698:AAH3CyPcn5g0uSf_Efa2qEAEA-9SJ8l6aCI")
 
 DICK_PHRASES = [
     "🍆 Мой огурчик",
@@ -36,6 +39,15 @@ DICK_PHRASES = [
     "🧲 Мой магнит",
     "🌿 Мой стебелёк",
 ]
+
+class HealthHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is running!")
+
+    def log_message(self, format, *args):
+        pass
 
 def generate_stats() -> str:
     dick_size = random.randint(3, 40)
@@ -91,7 +103,7 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     port = int(os.environ.get("PORT", 10000))
     server = HTTPServer(("0.0.0.0", port), HealthHandler)
-    
+
     web_thread = threading.Thread(target=server.serve_forever, daemon=True)
     web_thread.start()
     logger.info(f"Web server started on port {port}")
